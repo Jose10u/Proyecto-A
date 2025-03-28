@@ -1,0 +1,49 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity P_EXT is
+	
+	port
+	(
+		clk        : in STD_LOGIC;
+      reset      : in STD_LOGIC;
+      switches   : in STD_LOGIC_VECTOR(7 downto 0);
+      display    : out STD_LOGIC_VECTOR(6 downto 0);
+      piso_actual: out STD_LOGIC_VECTOR(2 downto 0)
+			
+	);
+end P_EXT;
+
+
+-- Library Clause(s) (optional)
+-- Use Clause(s) (optional)
+
+architecture arch_name of P_EXT is
+
+	component PanelExterior is
+    Port (
+        clk        : in STD_LOGIC;
+        reset      : in STD_LOGIC;
+        switches   : in STD_LOGIC_VECTOR(7 downto 0);
+        display    : out STD_LOGIC_VECTOR(6 downto 0);
+        piso_actual: out STD_LOGIC_VECTOR(2 downto 0)
+    );
+	end component;
+	
+	component DIV_FRECUENCIA is
+	port
+	(
+		-- Input ports
+		clk	: in  std_logic;
+		out1	: buffer  std_logic 
+		);
+
+	end component;
+
+	signal rel : std_logic;
+	
+begin
+
+	P1 : PanelExterior port map(rel, reset, switches, display, piso_actual);
+	
+end arch_name;

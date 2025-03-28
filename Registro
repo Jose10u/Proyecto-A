@@ -1,0 +1,32 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity REGISTRO is
+
+	port
+	(
+		-- Input ports
+		D	: in  std_logic_vector(2 downto 0);
+		clk : in std_logic;
+		
+		-- Output ports
+		Q	: out std_logic_vector(2 downto 0)
+		
+	);
+end REGISTRO;
+
+
+-- Library Clause(s) (optional)
+-- Use Clause(s) (optional)
+
+architecture arch_reg of REGISTRO is
+
+begin
+	process (clk) 
+	begin
+		if(clk'event and clk='1')then
+		Q <= D;
+		end if;
+	end process;
+end arch_reg;
+

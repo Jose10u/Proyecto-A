@@ -1,0 +1,63 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity PanelExterior is
+    Port (
+        clk : in STD_LOGIC;
+        reset : in STD_LOGIC;
+        switches : in STD_LOGIC_VECTOR(7 downto 0);
+        display : out STD_LOGIC_VECTOR(6 downto 0);
+        piso_actual : out STD_LOGIC_VECTOR(2 downto 0)
+    );
+end PanelExterior;
+
+architecture arch_PanelExterior of PanelExterior is
+
+    signal count : INTEGER range 0 to 50000000 := 0;
+    signal slow_clk : STD_LOGIC := '0';
+    signal piso : INTEGER range 1 to 5 := 1;
+
+begin
+ 
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if count = 50000000/2 - 1 then
+                count <= 0;
+                slow_clk <= not slow_clk;
+            else
+                count <= count + 1;
+            end if;
+        end if;
+    end process;
+
+    process(slow_clk, reset)
+    begin
+        if reset = '1' then
+            piso <= 1;
+        elsif rising_edge(slow_clk) then
+            if switches(7) = '1' and piso < 5 then
+                piso <= piso + 1;
+            elsif switches(0) = '1' and piso > 1 then
+                piso <= piso - 1;
+            end if;
+        end if;
+    end process;
+    
+    piso_actual <= CONV_STD_LOGIC_VECTOR(piso, 3);
+    
+    process(piso)
+    begin
+        case piso is
+            when 1 => display <= "1111001"; 
+            when 2 => display <= "0100100"; 
+            when 3 => display <= "0110000"; 
+            when 4 => display <= "0011001"; 
+            when 5 => display <= "0010010"; 
+            when others => display <= "1111111"; 
+        end case;
+    end process;
+    
+end arch_PanelExterior;

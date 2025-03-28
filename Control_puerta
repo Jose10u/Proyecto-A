@@ -1,0 +1,49 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity CONTROL_PUERTA is
+    port
+    (
+        clk : in std_logic;  
+        reset : in std_logic;  
+        orden : in std_logic;  
+        puertas : out std_logic  
+    );
+end CONTROL_PUERTA;
+
+architecture arch_CONTROL_PUERTA of CONTROL_PUERTA is
+    signal contador : unsigned(5 downto 0) := (others => '0');  
+    signal estado_puertas : std_logic := '0';  
+    signal abrir_en_espera : std_logic := '0';  
+begin
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            contador <= (others => '0');  
+            estado_puertas <= '0'; 
+            abrir_en_espera <= '0'; 
+        elsif rising_edge(clk) then
+            if orden = '1' and estado_puertas = '0' then
+                abrir_en_espera <= '1';  
+            end if;
+            if abrir_en_espera = '1' then
+                if contador < 10 then
+                    contador <= contador + 1;  
+                else
+                    estado_puertas <= '1';  
+                    contador <= (others => '0');  
+                    abrir_en_espera <= '0';  
+                end if;
+            elsif estado_puertas = '1' then
+                if contador < 45 then
+                    contador <= contador + 1;  
+                else
+                    estado_puertas <= '0';  
+                    contador <= (others => '0'); 
+                end if;
+            end if;
+        end if;
+    end process;
+    puertas <= estado_puertas;
+end arch_CONTROL_PUERTA;

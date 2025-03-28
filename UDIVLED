@@ -1,0 +1,62 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity UDIVLED is
+
+	port
+	(
+		-- Input ports
+		
+		 clk         : in STD_LOGIC;                     
+       res       : in STD_LOGIC;                     
+       
+       fallo : in STD_LOGIC;                  
+        
+       -- Output ports
+                   
+                        
+       fallo_energia : out STD_LOGIC 
+		
+	);
+end UDIVLED;
+
+
+-- Library Clause(s) (optional)
+-- Use Clause(s) (optional)
+
+architecture arch_UDIVLED of UDIVLED is
+
+	component control_luces is
+    Port (
+       -- Input ports
+        clk         : in STD_LOGIC;                     
+        reset       : in STD_LOGIC;                     
+        fallo_energia : in STD_LOGIC;        
+        
+       -- Output ports
+        
+        
+        luz_fallo_energia : out STD_LOGIC               
+    );
+	end component;
+	
+	component DIV_FRECUENCIA is
+	port
+	(
+		-- Input ports
+		clk_in	: in  std_logic;
+		clk_out	: buffer  std_logic 
+		);
+
+	end component;
+
+	signal dou : std_logic;
+	
+begin
+
+	D : DIV_FRECUENCIA port map(clk, dou);
+	
+	CL : Control_luces port map(dou, res, fallo, fallo_energia);
+
+end arch_UDIVLED;

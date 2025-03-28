@@ -1,0 +1,106 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity CONTADOR_PISO is
+    Port (
+        clk            : in  STD_LOGIC; 
+        hab_per, hab_fallo : in  STD_LOGIC; 
+        call_button    : in  STD_LOGIC_VECTOR(4 downto 0); 
+        door_open, func : out STD_LOGIC; 
+        display_out    : out STD_LOGIC_VECTOR(6 downto 0) 
+    );
+end CONTADOR_PISO;
+
+architecture arch_CONTADOR_PISO of CONTADOR_PISO is
+    signal floor_counter : INTEGER range 0 to 4 := 0; 
+    signal call_detected : INTEGER range 0 to 4 := 0; 
+    signal display_pattern : STD_LOGIC_VECTOR(6 downto 0); 
+    signal timer : INTEGER range 0 to 10 := 0; 
+    signal wait_timer : INTEGER range 0 to 5 := 0; 
+    signal moving : STD_LOGIC := '0';
+    signal call_active : STD_LOGIC := '0'; 
+    signal door_status : STD_LOGIC := '0'; 
+    signal wait_done : STD_LOGIC := '0'; 
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then 
+            if hab_per = '1' or hab_fallo = '1' then
+                call_active <= '0';
+                moving <= '0';
+                door_status <= '0';
+                timer <= 0;
+                wait_timer <= 0;
+					 func <= '0';
+            else
+                for i in 0 to 4 loop
+                    if call_button(i) = '1' then
+                        call_detected <= i;
+                        call_active <= '1';
+                        wait_done <= '0';
+                        door_status <= '0'; 
+                    end if;
+                end loop;
+                if call_active = '1' and floor_counter /= call_detected then
+                    moving <= '1';
+						  func <= '1';
+                    if timer < 2 then
+                        timer <= timer + 1;
+                    else
+                        timer <= 0;
+                        if floor_counter < call_detected then
+                            floor_counter <= floor_counter + 1; 
+                        elsif floor_counter > call_detected then
+                            floor_counter <= floor_counter - 1; 
+                        end if;
+                        if floor_counter = call_detected then
+                            moving <= '0';
+									 func <= '1';
+                            call_active <= '0'; 
+                            wait_timer <= 0; 
+                        end if;
+                    end if;
+                end if;
+                
+                if moving = '0' and floor_counter = call_detected then
+                    if wait_done = '0' then
+                        if wait_timer < 2 then 
+                            wait_timer <= wait_timer + 1;
+                        else
+                            wait_timer <= 0;
+                            wait_done <= '1';
+                            door_status <= '1'; 
+                        end if;
+                    elsif door_status = '1' then
+                        if wait_timer < 2 then 
+                            wait_timer <= wait_timer + 1;
+                        else
+                            wait_timer <= 0;
+                            door_status <= '0'; 
+                        end if;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    
+    process(floor_counter)
+    begin
+        case floor_counter is
+            when 0 => display_pattern <= "0000001"; 
+            when 1 => display_pattern <= "1001111"; 
+            when 2 => display_pattern <= "0010010"; 
+            when 3 => display_pattern <= "0000110"; 
+            when 4 => display_pattern <= "1001100"; 
+            when others => display_pattern <= "1111111"; 
+        end case;
+    end process;
+
+    
+    door_open <= door_status; 
+    display_out <= display_pattern;
+
+end arch_CONTADOR_PISO;

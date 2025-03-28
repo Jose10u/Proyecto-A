@@ -1,0 +1,37 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity control_luces is
+    Port (
+       -- Input ports
+        clk         : in STD_LOGIC;                     
+        reset       : in STD_LOGIC;                 
+        fallo_energia : in STD_LOGIC;        
+        
+       -- Output ports
+                        
+                         
+        luz_fallo_energia : out STD_LOGIC               
+    );
+end control_luces;
+
+architecture arch_control_luces of control_luces is
+
+	
+
+begin
+	
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            
+            
+            luz_fallo_energia <= '0';
+        elsif rising_edge(clk) then
+            luz_fallo_energia <= fallo_energia;
+        end if;
+    end process;
+
+end arch_control_luces;

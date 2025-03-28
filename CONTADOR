@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity CONTADOR is
+	
+	port
+	(
+		-- Input ports
+		clk : in  std_logic;
+		reset	: in  std_logic;
+		enable : in  std_logic;
+
+		-- Output ports
+		cout : out std_logic_vector(5 downto 0) 
+	);
+	
+end CONTADOR;
+
+architecture arch_contador of CONTADOR is
+
+	signal cnt : unsigned(5 downto 0);
+
+begin
+
+	pSeq:process(clk,reset)is
+	begin
+		if reset='1'then
+			cnt<=(others=>'0');
+		elsif clk'event and clk='1'then
+			if enable='1'then
+				cnt<=cnt+1;
+				if cnt=20 then
+					cnt<=(others=>'0');
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	cout<=std_logic_vector(cnt);
+	
+end arch_contador;

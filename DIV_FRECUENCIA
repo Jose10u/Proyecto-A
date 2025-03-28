@@ -1,0 +1,30 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity DIV_FRECUENCIA is
+    Port (
+        clk_in  : in  STD_LOGIC;  
+        clk_out : out STD_LOGIC   
+    );
+end DIV_FRECUENCIA;
+
+architecture arch_DIV_FRECUENCIA of DIV_FRECUENCIA is
+    signal count : INTEGER range 0 to 49999999 := 0;
+    signal clk_div : STD_LOGIC := '0';
+begin
+    process(clk_in)
+    begin
+        if rising_edge(clk_in) then
+            if count = 49999999 then
+                count <= 0;
+                clk_div <= not clk_div; 
+            else
+                count <= count + 1;
+            end if;
+        end if;
+    end process;
+    
+    clk_out <= clk_div; 
+end arch_DIV_FRECUENCIA;

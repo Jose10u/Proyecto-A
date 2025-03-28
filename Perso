@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Perso is
+    Port (
+        clk      : in  STD_LOGIC;  
+        btn_up   : in  STD_LOGIC;  
+        btn_down : in  STD_LOGIC;  
+        led_alert, aut: out STD_LOGIC;  
+        count    : out STD_LOGIC_VECTOR(3 downto 0) 
+    );
+end Perso;
+
+architecture arch_Perso of Perso is
+    signal person_count : STD_LOGIC_VECTOR(3 downto 0) := "0000";
+    signal btn_up_last, btn_down_last : STD_LOGIC := '0'; 
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if btn_up = '1' and btn_up_last = '0' then
+                if person_count < "1111" then 
+                    person_count <= person_count + 1;
+                end if;
+            end if;
+            if btn_down = '1' and btn_down_last = '0' then
+                if person_count > "0000" then
+                    person_count <= person_count - 1;
+                end if;
+            end if;
+            btn_up_last   <= btn_up;
+            btn_down_last <= btn_down;
+        end if;
+    end process;
+
+    led_alert <= '1' when person_count > "1010" else '0';
+	 aut <= '1' when person_count > "1010" else '0';
+
+    count <= person_count;
+end arch_Perso;

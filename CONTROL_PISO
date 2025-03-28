@@ -1,0 +1,94 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity CONTROL_PISO is
+	port
+	(
+		-- Input ports
+		p_sel	: in  std_logic_vector(4 downto 0);
+		clk : in std_logic;
+		
+		problema, reset : in std_logic;
+		
+		btn_up   : in  STD_LOGIC;  
+      btn_down : in  STD_LOGIC;  
+      led_alert, aut: out STD_LOGIC;  
+      count    : out STD_LOGIC_VECTOR(3 downto 0);
+		
+		-- Output ports
+		r_piso	: out std_logic_vector(6 downto 0);
+		o_puerta	: out std_logic
+	);
+end CONTROL_PISO;
+
+
+-- Library Clause(s) (optional)
+-- Use Clause(s) (optional)
+
+architecture arch_CONTROL_PISO of CONTROL_PISO is
+
+	component UDIVLED is
+	port
+	(
+		-- Input ports
+		
+		 clk         : in STD_LOGIC;                     
+       res       : in STD_LOGIC;                     
+       
+       fallo : in STD_LOGIC;                   
+        
+       -- Output ports
+                   
+                        
+       fallo_energia : out STD_LOGIC 
+		
+	);
+	end component;
+
+
+	component Perso is
+    Port (
+        clk      : in  STD_LOGIC;  
+        btn_up   : in  STD_LOGIC;  
+        btn_down : in  STD_LOGIC;
+        led_alert, aut: out STD_LOGIC;  
+        count    : out STD_LOGIC_VECTOR(3 downto 0) 
+    );
+	end component;
+
+
+	component CONTADOR_PISO is
+        Port (
+        clk            : in  STD_LOGIC; 
+        hab_per, hab_fallo : in  STD_LOGIC; 
+        call_button    : in  STD_LOGIC_VECTOR(4 downto 0); 
+        door_open, func : out STD_LOGIC; 
+        display_out    : out STD_LOGIC_VECTOR(6 downto 0) 
+    );
+	end component;
+	
+	component DIV_FRECUENCIA is
+	port
+	(
+		-- Input ports
+		clk_in	: in  std_logic;
+		clk_out	: buffer  std_logic 
+		);
+
+	end component;
+	
+	signal rel, permiso, teta : std_logic;
+	
+begin
+	
+	L : UDIVLED port map(clk, reset, problema, teta);
+	
+	D : DIV_FRECUENCIA port map(clk, rel);
+	
+	CP : CONTADOR_PISO port map(rel, permiso, teta, p_sel, o_puerta, aut, r_piso);
+	
+	P : Perso port map(clk, btn_up, btn_down, led_alert, permiso, count);
+
+end arch_CONTROL_PISO;
+
